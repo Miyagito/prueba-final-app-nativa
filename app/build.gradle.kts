@@ -29,7 +29,8 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.retrofit2)
+    implementation(libs.gsonConverter)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

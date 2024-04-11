@@ -7,4 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".AddMovieActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/editTextImdbId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="IMDb ID" />
+
+        <Button
+            android:id="@+id/buttonFetchMovie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fetch Movie" />
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
