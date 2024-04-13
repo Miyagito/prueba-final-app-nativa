@@ -10,14 +10,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.pruebafinalappnativa.R;
 import java.util.List;
+import java.util.Set;
 import model.Movie;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
     private final List<Movie> moviesList;
+    private Set<Movie> selectedMovies;
+    private final OnMovieSelectionListener selectionListener;
+    private final boolean isMovieListView;
 
-    public MovieAdapter(List<Movie> moviesList) {
+    public interface OnMovieSelectionListener {
+        void onMovieSelectionChanged(Movie movie, boolean isSelected);
+    }
+
+    public MovieAdapter(List<Movie> moviesList, Set<Movie> selectedMovies, OnMovieSelectionListener listener, boolean isMovieListView) {
         this.moviesList = moviesList;
+        this.selectedMovies = selectedMovies;
+        this.selectionListener = listener;
+        this.isMovieListView = isMovieListView;
     }
 
     @NonNull
@@ -39,16 +50,46 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             Glide.with(holder.itemView.getContext())
                     .load(movie.getPoster())
                     .placeholder(android.R.drawable.ic_menu_gallery)
-
                     .into(holder.moviePosterImageView);
         } else {
             holder.moviePosterImageView.setImageResource(android.R.drawable.ic_menu_gallery);
         }
+
+        if (isMovieListView) {
+            holder.addButton.setImageResource(android.R.drawable.ic_menu_delete);
+        } else {
+            holder.addButton.setImageResource(android.R.drawable.ic_input_add);
+        }
+
+        holder.addButton.setOnClickListener(view -> {
+            boolean isSelected = selectedMovies.contains(movie);
+            if (isSelected) {
+                selectedMovies.remove(movie);
+            } else {
+                selectedMovies.add(movie);
+            }
+            selectionListener.onMovieSelectionChanged(movie, !isSelected);
+
+            if (isMovieListView) {
+                moviesList.remove(position);
+                notifyItemRemoved(position);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return moviesList != null ? moviesList.size() : 0;
+        return moviesList.size();
+    }
+
+    public Set<Movie> getSelectedMovies() {
+        return selectedMovies;
+    }
+
+    public void setSelectedMovies(Set<Movie> selectedMovies) {
+        this.selectedMovies.clear();
+        this.selectedMovies.addAll(selectedMovies);
+        notifyDataSetChanged();
     }
 
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
@@ -57,6 +98,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         TextView movieYearTextView;
         TextView movieTypeTextView;
         TextView movieImdbIDTextView;
+        ImageView addButton;
 
         public MovieViewHolder(View view) {
             super(view);
@@ -65,6 +107,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             movieYearTextView = view.findViewById(R.id.movieYearTextView);
             movieTypeTextView = view.findViewById(R.id.movieTypeTextView);
             movieImdbIDTextView = view.findViewById(R.id.movieImdbIDTextView);
+            addButton = view.findViewById(R.id.addButton);
         }
     }
 }

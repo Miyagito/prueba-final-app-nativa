@@ -1,4 +1,3 @@
-// MainActivity.java
 package com.example.pruebafinalappnativa;
 
 import android.content.Intent;
@@ -8,20 +7,21 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 import adapter.MovieAdapter;
 import model.Movie;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.OnMovieSelectionListener {
 
-    private static final int REQUEST_CODE_ADD_MOVIE = 1; // Código de solicitud arbitrario
-    private RecyclerView recyclerView;
-    private FloatingActionButton fab;
+    private static final int REQUEST_CODE_ADD_MOVIE = 1;
+    private RecyclerView recyclerViewMovies;
+    private FloatingActionButton fabAddMovie;
     private List<Movie> moviesList;
-    private MovieAdapter adapter;
+    private MovieAdapter movieAdapter;
+    private Set<Movie> selectedMovies = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,46 +31,53 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        recyclerView = findViewById(R.id.recycler_view_movies);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewMovies = findViewById(R.id.recycler_view_movies);
+        recyclerViewMovies.setLayoutManager(new LinearLayoutManager(this));
 
         moviesList = new ArrayList<>();
-        adapter = new MovieAdapter(moviesList);
-        recyclerView.setAdapter(adapter);
+        movieAdapter = new MovieAdapter(moviesList, selectedMovies, this, true);
+        recyclerViewMovies.setAdapter(movieAdapter);
 
-        fab = findViewById(R.id.add_movie_fab);
-        fab.setOnClickListener(view -> {
+        fabAddMovie = findViewById(R.id.add_movie_fab);
+        fabAddMovie.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, AddMovieActivity.class);
             startActivityForResult(intent, REQUEST_CODE_ADD_MOVIE);
         });
     }
 
     @Override
+    public void onMovieSelectionChanged(Movie movie, boolean isSelected) {
+        if (isSelected) {
+            selectedMovies.add(movie);
+        } else {
+            selectedMovies.remove(movie);
+        }
+        refreshSelectedMoviesView();
+    }
+
+    private void refreshSelectedMoviesView() {
+        // Esta función debería actualizar el RecyclerView con las películas seleccionadas.
+        movieAdapter.setSelectedMovies(selectedMovies); // Pasar las películas seleccionadas al adaptador.
+        movieAdapter.notifyDataSetChanged(); // Notificar al adaptador que los datos han cambiado para refrescar la vista.
+    }
+
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_ADD_MOVIE && resultCode == RESULT_OK && data != null) {
-            ArrayList<String> movieTitles = data.getStringArrayListExtra("movieTitles");
-            ArrayList<String> movieYears = data.getStringArrayListExtra("movieYears");
-            // Asumiendo que también pasas los IDs de IMDb, tipos y URLs de los pósters.
-            ArrayList<String> movieImdbIDs = data.getStringArrayListExtra("movieImdbIDs");
-            ArrayList<String> movieTypes = data.getStringArrayListExtra("movieTypes");
-            ArrayList<String> moviePosters = data.getStringArrayListExtra("moviePosters");
-
-            if (movieTitles != null && movieYears != null && movieImdbIDs != null && movieTypes != null && moviePosters != null) {
-                for (int i = 0; i < movieTitles.size(); i++) {
-                    String posterUrl = moviePosters.get(i).equals("N/A") ? null : moviePosters.get(i); // Reemplaza "N/A" por null o un URL de imagen por defecto
-                    moviesList.add(new Movie(
-                            movieTitles.get(i),
-                            movieYears.get(i),
-                            movieImdbIDs.get(i),
-                            movieTypes.get(i),
-                            posterUrl
-                    ));
-                }
-                adapter.notifyDataSetChanged();
+            ArrayList<Movie> newSelectedMovies = data.getParcelableArrayListExtra("selectedMovies");
+            if (newSelectedMovies != null) {
+                selectedMovies.addAll(newSelectedMovies);
+                moviesList.clear();
+                moviesList.addAll(selectedMovies);
+                movieAdapter.setSelectedMovies(selectedMovies);
+                movieAdapter.notifyDataSetChanged();
             }
         }
     }
+
+
 
 }

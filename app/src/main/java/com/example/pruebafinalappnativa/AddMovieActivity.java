@@ -1,5 +1,6 @@
 package com.example.pruebafinalappnativa;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -9,7 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import adapter.MovieAdapter;
@@ -37,7 +41,14 @@ public class AddMovieActivity extends AppCompatActivity {
         Button buttonFetchMovie = findViewById(R.id.buttonFetchMovie);
         recyclerViewMovies = findViewById(R.id.recyclerViewMovies);
         moviesList = new ArrayList<>();
-        adapter = new MovieAdapter(moviesList);
+
+        // Necesitas crear un OnMovieSelectionListener y pasarlo aquí.
+        // Como este es el AddMovieActivity y no necesitas manejar la selección aquí,
+        // puedes pasar un lambda que no haga nada o el contexto de la actividad si implementas la interfaz en la actividad.
+        adapter = new MovieAdapter(moviesList, new HashSet<>(), (movie, isSelected) -> {
+            // Aquí puedes manejar la selección si fuera necesario.
+            // Como es AddMovieActivity, probablemente no necesites hacer nada aquí.
+        }, false);
 
         recyclerViewMovies.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewMovies.setAdapter(adapter);
@@ -45,6 +56,20 @@ public class AddMovieActivity extends AppCompatActivity {
         buttonFetchMovie.setOnClickListener(view -> {
             String searchTerm = editTextSearchTerm.getText().toString();
             fetchMoviesByTitle(searchTerm);
+        });
+
+        // Encuentra el botón por su ID
+        MaterialButton buttonReturn = findViewById(R.id.buttonReturn);
+
+        // Asigna un OnClickListener al botón
+        buttonReturn.setOnClickListener(view -> {
+            // Prepara los datos a devolver a MainActivity
+            Intent resultIntent = new Intent();
+            resultIntent.putParcelableArrayListExtra("selectedMovies", new ArrayList<>(adapter.getSelectedMovies()));
+            setResult(RESULT_OK, resultIntent);
+
+            // Finaliza esta actividad, lo que llevará al usuario de vuelta a MainActivity
+            finish();
         });
     }
 
@@ -91,5 +116,15 @@ public class AddMovieActivity extends AppCompatActivity {
                 // Aquí podrías mostrar un mensaje al usuario o actualizar la UI para reflejar el error
             }
         });
+
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent resultIntent = new Intent();
+        resultIntent.putParcelableArrayListExtra("selectedMovies", new ArrayList<>(adapter.getSelectedMovies()));
+        setResult(RESULT_OK, resultIntent);
+        super.onBackPressed();
+    }
+
 }
