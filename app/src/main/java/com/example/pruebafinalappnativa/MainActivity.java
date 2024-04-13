@@ -52,13 +52,25 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_ADD_MOVIE && resultCode == RESULT_OK && data != null) {
             ArrayList<String> movieTitles = data.getStringArrayListExtra("movieTitles");
             ArrayList<String> movieYears = data.getStringArrayListExtra("movieYears");
+            // Asumiendo que también pasas los IDs de IMDb, tipos y URLs de los pósters.
+            ArrayList<String> movieImdbIDs = data.getStringArrayListExtra("movieImdbIDs");
+            ArrayList<String> movieTypes = data.getStringArrayListExtra("movieTypes");
+            ArrayList<String> moviePosters = data.getStringArrayListExtra("moviePosters");
 
-            if (movieTitles != null && movieYears != null) {
+            if (movieTitles != null && movieYears != null && movieImdbIDs != null && movieTypes != null && moviePosters != null) {
                 for (int i = 0; i < movieTitles.size(); i++) {
-                    moviesList.add(new Movie(movieTitles.get(i), "Actor Desconocido", movieYears.get(i), "Ciudad Desconocida"));
+                    String posterUrl = moviePosters.get(i).equals("N/A") ? null : moviePosters.get(i); // Reemplaza "N/A" por null o un URL de imagen por defecto
+                    moviesList.add(new Movie(
+                            movieTitles.get(i),
+                            movieYears.get(i),
+                            movieImdbIDs.get(i),
+                            movieTypes.get(i),
+                            posterUrl
+                    ));
                 }
                 adapter.notifyDataSetChanged();
             }
         }
     }
+
 }

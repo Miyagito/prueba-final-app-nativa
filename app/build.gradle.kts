@@ -29,6 +29,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.glide)
+    annotationProcessor(libs.glideCompiler)
     implementation(libs.retrofit2)
     implementation(libs.gsonConverter)
     implementation(libs.appcompat)

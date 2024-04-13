@@ -3,15 +3,13 @@ package adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.bumptech.glide.Glide;
 import com.example.pruebafinalappnativa.R;
-
 import java.util.List;
-
 import model.Movie;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
@@ -25,16 +23,27 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @NonNull
     @Override
     public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_movie, parent, false);
         return new MovieViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         Movie movie = moviesList.get(position);
-        holder.titleTextView.setText(movie.getTitle());
-        holder.actorTextView.setText(movie.getMainActor());
-        // Aquí podrías configurar más vistas si agregaste más al movie_item.xml
+        holder.movieTitleTextView.setText(movie.getTitle());
+        holder.movieYearTextView.setText(movie.getYear());
+        holder.movieTypeTextView.setText(movie.getType());
+        holder.movieImdbIDTextView.setText(movie.getImdbID());
+
+        if (!"N/A".equals(movie.getPoster())) {
+            Glide.with(holder.itemView.getContext())
+                    .load(movie.getPoster())
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+
+                    .into(holder.moviePosterImageView);
+        } else {
+            holder.moviePosterImageView.setImageResource(android.R.drawable.ic_menu_gallery);
+        }
     }
 
     @Override
@@ -43,13 +52,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView;
-        TextView actorTextView;
+        ImageView moviePosterImageView;
+        TextView movieTitleTextView;
+        TextView movieYearTextView;
+        TextView movieTypeTextView;
+        TextView movieImdbIDTextView;
 
         public MovieViewHolder(View view) {
             super(view);
-            titleTextView = view.findViewById(R.id.tv_movie_title);
-            actorTextView = view.findViewById(R.id.tv_movie_actor);
+            moviePosterImageView = view.findViewById(R.id.moviePosterImageView);
+            movieTitleTextView = view.findViewById(R.id.movieTitleTextView);
+            movieYearTextView = view.findViewById(R.id.movieYearTextView);
+            movieTypeTextView = view.findViewById(R.id.movieTypeTextView);
+            movieImdbIDTextView = view.findViewById(R.id.movieImdbIDTextView);
         }
     }
 }
