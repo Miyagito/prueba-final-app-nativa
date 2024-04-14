@@ -65,14 +65,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             boolean isSelected = selectedMovies.contains(movie);
             if (isSelected) {
                 selectedMovies.remove(movie);
+                selectionListener.onMovieSelectionChanged(movie, false);
             } else {
-                selectedMovies.add(movie);
+                // Verificar que la película no esté ya en el conjunto antes de añadirla
+                if (!selectedMovies.contains(movie)) {
+                    selectedMovies.add(movie);
+                    selectionListener.onMovieSelectionChanged(movie, true);
+                }
             }
-            selectionListener.onMovieSelectionChanged(movie, !isSelected);
-
             if (isMovieListView) {
                 moviesList.remove(position);
                 notifyItemRemoved(position);
+                notifyItemRangeChanged(position, moviesList.size());
             }
         });
     }

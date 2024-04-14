@@ -2,6 +2,8 @@ package com.example.pruebafinalappnativa;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.OnMo
             Intent intent = new Intent(MainActivity.this, AddMovieActivity.class);
             startActivityForResult(intent, REQUEST_CODE_ADD_MOVIE);
         });
+        refreshSelectedMoviesView();
     }
 
     @Override
@@ -56,10 +59,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.OnMo
     }
 
     private void refreshSelectedMoviesView() {
-        // Esta función debería actualizar el RecyclerView con las películas seleccionadas.
-        movieAdapter.setSelectedMovies(selectedMovies); // Pasar las películas seleccionadas al adaptador.
-        movieAdapter.notifyDataSetChanged(); // Notificar al adaptador que los datos han cambiado para refrescar la vista.
+        if (selectedMovies.isEmpty()) {
+            // Si no hay películas seleccionadas, mostrar la tarjeta de estado vacío.
+            findViewById(R.id.empty_state_card).setVisibility(View.VISIBLE);
+            recyclerViewMovies.setVisibility(View.GONE);
+        } else {
+            // Si hay películas seleccionadas, actualizar la lista y mostrar el RecyclerView.
+            findViewById(R.id.empty_state_card).setVisibility(View.GONE);
+            recyclerViewMovies.setVisibility(View.VISIBLE);
+
+            // Actualiza la lista que el adaptador está usando y notifica al adaptador.
+            moviesList.clear();
+            moviesList.addAll(selectedMovies);
+            movieAdapter.notifyDataSetChanged();
+        }
     }
+
 
 
     @Override
@@ -70,10 +85,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.OnMo
             ArrayList<Movie> newSelectedMovies = data.getParcelableArrayListExtra("selectedMovies");
             if (newSelectedMovies != null) {
                 selectedMovies.addAll(newSelectedMovies);
-                moviesList.clear();
-                moviesList.addAll(selectedMovies);
-                movieAdapter.setSelectedMovies(selectedMovies);
-                movieAdapter.notifyDataSetChanged();
+                refreshSelectedMoviesView(); // Actualiza la vista después de añadir las películas
             }
         }
     }
