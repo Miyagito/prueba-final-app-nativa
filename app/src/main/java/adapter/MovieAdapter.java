@@ -25,6 +25,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
     public MovieAdapter(List<Movie> moviesList, Set<Movie> selectedMovies, OnMovieSelectionListener listener, boolean isMovieListView) {
+        setHasStableIds(true);
         this.moviesList = moviesList;
         this.selectedMovies = selectedMovies;
         this.selectionListener = listener;
@@ -62,23 +63,42 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         }
 
         holder.addButton.setOnClickListener(view -> {
-            boolean isSelected = selectedMovies.contains(movie);
-            if (isSelected) {
-                selectedMovies.remove(movie);
-                selectionListener.onMovieSelectionChanged(movie, false);
-            } else {
-                // Verificar que la película no esté ya en el conjunto antes de añadirla
-                if (!selectedMovies.contains(movie)) {
-                    selectedMovies.add(movie);
-                    selectionListener.onMovieSelectionChanged(movie, true);
-                }
-            }
-            if (isMovieListView) {
-                moviesList.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, moviesList.size());
+            if (holder.getAdapterPosition() != RecyclerView.NO_POSITION) {
+                handleMovieClick(moviesList.get(holder.getAdapterPosition()));
             }
         });
+
+    }
+
+    private void handleMovieClick(Movie movie) {
+        boolean isSelected = selectedMovies.contains(movie);
+        if (isSelected) {
+            selectedMovies.remove(movie);
+            selectionListener.onMovieSelectionChanged(movie, false);
+            if (isMovieListView) {
+                removeMovieById(movie.getImdbID());
+            }
+        } else {
+            if (!selectedMovies.contains(movie)) {
+                selectedMovies.add(movie);
+                selectionListener.onMovieSelectionChanged(movie, true);
+            }
+        }
+    }
+
+    private void removeMovieById(String imdbId) {
+        int indexToRemove = -1;
+        for (int i = 0; i < moviesList.size(); i++) {
+            if (moviesList.get(i).getImdbID().equals(imdbId)) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove != -1) {
+            moviesList.remove(indexToRemove);
+            notifyItemRemoved(indexToRemove);
+            notifyItemRangeChanged(indexToRemove, getItemCount());
+        }
     }
 
     @Override
@@ -86,14 +106,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return moviesList.size();
     }
 
-    public Set<Movie> getSelectedMovies() {
-        return selectedMovies;
+    @Override
+    public long getItemId(int position) {
+        return moviesList.get(position).getImdbID().hashCode();
     }
 
-    public void setSelectedMovies(Set<Movie> selectedMovies) {
-        this.selectedMovies.clear();
-        this.selectedMovies.addAll(selectedMovies);
-        notifyDataSetChanged();
+    public Set<Movie> getSelectedMovies() {
+        return selectedMovies;
     }
 
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
