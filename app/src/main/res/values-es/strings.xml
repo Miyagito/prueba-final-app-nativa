@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Lista de Películas</string>
+    <string name="search_hint">Término de búsqueda</string>
+    <string name="fetch_movie_button">Buscar Película</string>
+    <string name="return_to_list">Volver a la lista de películas</string>
+    <string name="no_movies_added">Aún no has agregado películas</string>
+    <string name="add_favorites_prompt">¡Busca y agrega tus películas favoritas!</string>
+    <string name="movie_title">Título de la Película</string>
+    <string name="year">Año</string>
+    <string name="type">Tipo</string>
+    <string name="imdb_id">ID de IMDb</string>
+    <string name="add_to_watched">Añadir a Vistos</string>
+</resources>

@@ -1,4 +1,13 @@
 <resources>
-    <string name="app_name">Películas vistas</string>
-    <string name="add_to_saw_it">Añadir a vistos</string>
+    <string name="app_name">Movie Watchlist</string>
+    <string name="search_hint">Search term</string>
+    <string name="fetch_movie_button">Fetch Movie</string>
+    <string name="return_to_list">Return to Movie List</string>
+    <string name="no_movies_added">No movies added yet</string>
+    <string name="add_favorites_prompt">Search and add your favorite movies!</string>
+    <string name="movie_title">Movie Title</string>
+    <string name="year">Year</string>
+    <string name="type">Type</string>
+    <string name="imdb_id">IMDB ID</string>
+    <string name="add_to_watched">Add to Watched</string>
 </resources>

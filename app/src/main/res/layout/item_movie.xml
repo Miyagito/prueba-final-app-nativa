@@ -69,7 +69,7 @@
             app:srcCompat="@android:drawable/ic_input_add"
             app:tint="@android:color/white"
             app:fabSize="mini"
-            android:contentDescription="@string/add_to_saw_it" />
+            android:contentDescription="@string/add_to_watched" />
 
     </RelativeLayout>
 
